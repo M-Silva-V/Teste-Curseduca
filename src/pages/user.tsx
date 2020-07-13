@@ -3,7 +3,7 @@ import { Grid, Button, Typography, Container } from "@material-ui/core";
 import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-material-ui";
-import { openApi, isToken, getToken } from "../services/api";
+import { openApi } from "../services/api";
 import { useHistory } from "react-router-dom";
 import { toastr } from "react-redux-toastr";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,41 +15,38 @@ interface IForm {
 }
 
 const validationSchema = yup.object().shape({
-  email: yup.string()
-    .email('Email inválido')
-    .required('Obrigatório'),
-  password: yup.string().required('Obrigatório'),
+  email: yup.string().email("Email inválido").required("Obrigatório"),
+  password: yup.string().required("Obrigatório"),
 });
-
 
 const User = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const user = useSelector<{ user: IUser }, IUser>(state => state?.user);
+  const user = useSelector<{ user: IUser }, IUser>((state) => state?.user);
 
   useEffect(() => {
-    if (user.isAuth) history.push('/feed');
-  }, [user, history])
-  
+    if (user.isAuth) history.push("/feed");
+  }, [user, history]);
+
   const login = async ({ email, password }: IForm) => {
     try {
-      const res = await openApi.post('/auth/login', {
+      const res = await openApi.post("/auth/login", {
         email: email,
-        password: password
+        password: password,
       });
       if (res.data.access_token) {
-        localStorage.setItem('@token', res.data.access_token);
+        localStorage.setItem("@token", res.data.access_token);
         dispatch(addUser({ email, isAuth: true }));
-        toastr.success('Sucesso!', 'Usuário logado!');
+        toastr.success("Sucesso!", "Usuário logado!");
       } else {
-        toastr.error('Erro!', 'Usuário não existe!');
+        toastr.error("Erro!", "Usuário não existe!");
         dispatch(removeUser());
       }
     } catch (error) {
-      toastr.error('Erro!', 'Erro na requisição!');
+      toastr.error("Erro!", "Erro na requisição!");
       dispatch(removeUser());
     }
-  }
+  };
 
   return (
     <Container>
